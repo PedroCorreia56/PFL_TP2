@@ -9,5 +9,4 @@ play :-
 %starts a game with Player1Type vs Player2Type
 start_game(GameState,Player1Type,Player2Type) :-
     clear,
-    display_game(GameState),
-    
+    display_game(GameState).
