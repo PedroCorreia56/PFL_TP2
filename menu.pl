@@ -120,7 +120,7 @@ menu_option(4):-
 % Starting Game
 pp_menu(1):-
     initial(1,GameState),
-    %nth0(1,GameState,Player),
-    %nth0(0,GameState,Board),
-    start_game(GameState,'Player','Player'),
+    assert(player(1,'Human')),
+    assert(player(2,'Human')),
+    start_game(GameState),
     menu.

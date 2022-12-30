@@ -22,6 +22,17 @@ code(3,"L1"). % lion player 1
 code(-3,"L2"). % lion player 2
 code(4,"GO"). % goal 
 
+column(0, '0').
+column(1, '1').
+column(2, '2').
+column(3, '3').
+column(4, '4').
+column(5, '5').
+column(6, '6').
+column(7, '7').
+column(8, '8').
+column(9, '9').
+
 % Codes for board rows
 row(0, 'A').
 row(1, 'B').
