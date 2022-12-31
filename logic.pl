@@ -308,48 +308,54 @@ check_not_scared_elem(ColumnNumber,LineNumayerTurn,Board,PlayerTurn):-
       %  check_not_scared_elem(Next_Elem,LineNumberrTurn,ScaredPiece).
 
 
-check_scared_line(C,L,[Board,PlayerTurn],State,ScaredPiece):-
-        State\=true,
+check_scared_line(C,L,[Board,PlayerTurn],ScaredPiece):-
+        C<10,
+        L<10,
+        var(ScaredPiece),
         \+check_not_scared_elem(C,L,Board,PlayerTurn),
         nth0(L,Board,Line),
         nth0(C,Line,Elem),
+        Elem\=0,
+        write('BEFORE CEHCK'),
         check_elem(Elem,PlayerTurn),
-        write('Entered true'),nl,
-        write('Elem: '),write(Elem),nl,
+        write('AFTER CEHCK'),
+        write('Elem:'),write(Elem),nl,
+        scared_of(Elem,Scared),
+        write('Scared:'),write(Scared),nl,
         ScaredPiece=L-C,
-        !,
-        write('ScaredPiece: '),write(ScaredPiece),nl,
-        State=true.
+        write('COlumn:'),write(C),nl,
+        write('Line:'),write(L),nl.
 
-check_scared_line(ElemNumber,LineNumber,[Board,PlayerTurn],false,ScaredPiece):-
-      %  write('ElemNumber: '),write(ElemNumber),nl,
-       % write('LineNumber: '),write(LineNumber),nl,
-        LineNumber\=10,
-        check_not_scared_elem(ElemNumber,LineNumber,Board,PlayerTurn),
-        var(ScaredPiece),   
-        (ElemNumber =:= 9 -> 
-        Next_Elem is 0,Next_Line is LineNumber+1;
-        Next_Elem is ElemNumber+1,Next_Line is LineNumber),
-        check_scared_line(Next_Elem,Next_Line,[Board,PlayerTurn],false,ScaredPiece).
+check_scared_line(9,9,[Board,PlayerTurn],ScaredPiece):-
+        check_not_scared_elem(9,9,Board,PlayerTurn),
+        var(ScaredPiece).
 
-check_scared_line(ElemNumber,LineNumber,[Board,PlayerTurn],false,ScaredPiece):-
-      %  write('ElemNumber: '),write(ElemNumber),nl,
-     %   write('LineNumber: '),write(LineNumber),nl,
+check_scared_line(ElemNumber,LineNumber,[Board,PlayerTurn],ScaredPiece):-
+        write('1 ElemNumber: '),write(ElemNumber),nl,
+        write('1 LineNumber: '),write(LineNumber),nl,
         LineNumber\=10,
         \+check_not_scared_elem(ElemNumber,LineNumber,Board,PlayerTurn),
         var(ScaredPiece),   
         (ElemNumber =:= 9 -> 
         Next_Elem is 0,Next_Line is LineNumber+1;
         Next_Elem is ElemNumber+1,Next_Line is LineNumber),
-        check_scared_line(Next_Elem,Next_Line,[Board,PlayerTurn],false,ScaredPiece).
+        check_scared_line(Next_Elem,Next_Line,[Board,PlayerTurn],ScaredPiece).
+
+check_scared_line(ElemNumber,LineNumber,[Board,PlayerTurn],ScaredPiece):-
+        write('2 ElemNumber: '),write(ElemNumber),nl,
+        write('2 LineNumber: '),write(LineNumber),nl,
+        LineNumber\=10,
+        check_not_scared_elem(ElemNumber,LineNumber,Board,PlayerTurn),
+        var(ScaredPiece),   
+        (ElemNumber =:= 9 -> 
+        Next_Elem is 0,Next_Line is LineNumber+1;
+        Next_Elem is ElemNumber+1,Next_Line is LineNumber),
+        check_scared_line(Next_Elem,Next_Line,[Board,PlayerTurn],ScaredPiece).
 
 
 
-check_scared_line(9,9,[Board,PlayerTurn],false,ScaredPiece):-
-        check_not_scared_elem(9,9,Board,PlayerTurn),
-        var(ScaredPiece).
 
-check_scared_line(C,L,[Board,PlayerTurn],true,L-C).
+
 
 
 
@@ -368,10 +374,10 @@ testee:-
 
 teste2:-   
         initial(1,[Board,PlayerTurn]),
-        check_scared_line(0,0,[Board,PlayerTurn],false,ScaredPiece),
+        check_scared_line(0,0,[Board,1],ScaredPiece),
         var(ScaredPiece).
 
 teste3:-
         initial(1,[Board,PlayerTurn]),
-        check_scared_line(0,0,[Board,PlayerTurn],false,ScaredPiece),
+        check_scared_line(0,0,[Board,1],ScaredPiece),
         nonvar(ScaredPiece),nl,write(ScaredPiece),nl.
