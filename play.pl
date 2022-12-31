@@ -1,3 +1,6 @@
+:- consult('display.pl').
+
+
 %play/0
 %main predicate for game start, presents the main menu
 play :-
@@ -5,6 +8,12 @@ play :-
   %  talpa_logo,
     menu.
 
+
+
+
+try_move(GameState,Move,NewGameState) :-
+    (move(GameState,Move,NewGameState)-> !;(write('Invalid move. \n!'),fail)).
+    
 
 
 
@@ -17,9 +26,11 @@ play :-
 make_a_move([Board,PlayerTurn],NewGameState) :-
     player(PlayerTurn,'Human'),
     repeat,
+
     catch((read_move(GameState,Move)),_,(write('Invalid input. Try again\n!'),fail)),
     try_move(GameState,Move,NewGameState),
     skip_line,!.
+
 make_a_move([Board,PlayerTurn],NewGameState) :-
     player(PlayerTurn,'Computer'),
     %TODO

@@ -22,6 +22,16 @@ code(3,"L1"). % lion player 1
 code(-3,"L2"). % lion player 2
 code(4,"GO"). % goal 
 
+% Whos scared of who
+scaredof(1,-2).
+scaredof(-1,2).
+scaredof(2,-3).
+scaredof(-2,3).
+scaredof(3,-1).
+scaredof(-3,1).
+
+
+
 column(0, '0').
 column(1, '1').
 column(2, '2').
@@ -135,4 +145,9 @@ display_game(GameState):-
 
 test:-
     initial(1,GameState),
-    display_game(GameState).
+    teste2(GameState).
+
+teste2([Board,P]):-
+    nth0(1,Board,Line),
+    nth0(5,Line,Element),
+    write(Element).

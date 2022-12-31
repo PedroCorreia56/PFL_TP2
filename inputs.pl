@@ -3,16 +3,27 @@
 %Ascii code for the hifen
 code_number_hifen(45, "-").
 % ASCII code and respective decimal number
-code_number(48, "0").
-code_number(49, "1").
-code_number(50, "2").
-code_number(51, "3").
-code_number(52, "4").
-code_number(53, "5").
-code_number(54, "6").
-code_number(55, "7").
-code_number(56, "8").
-code_number(57, "9").
+code_number(48,0).
+code_number(49,1).
+code_number(50,2).
+code_number(51,3).
+code_number(52,4).
+code_number(53,5).
+code_number(54,6).
+code_number(55,7).
+code_number(56,8).
+code_number(57,9).
+% THis one is for the move input
+code_number2(48, "0").
+code_number2(49, "1").
+code_number2(50, "2").
+code_number2(51, "3").
+code_number2(52, "4").
+code_number2(53, "5").
+code_number2(54, "6").
+code_number2(55, "7").
+code_number2(56, "8").
+code_number2(57, "9").
 
 
 %ASCII code and respective lower-case letter
@@ -76,7 +87,7 @@ check_code(X,Len,Char):-
     Len \=0,
     Len \=2,
     Len \=3,
-    code_number(X,Char).
+    code_number2(X,Char).
 
 % read_move_aux(-MoveString)
 read_move_aux(X):-
