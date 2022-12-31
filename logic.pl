@@ -308,26 +308,6 @@ check_not_scared_elem(ColumnNumber,LineNumayerTurn,Board,PlayerTurn):-
       %  check_not_scared_elem(Next_Elem,LineNumberrTurn,ScaredPiece).
 
 
-% VER CASO HAJA UMA PEÇA PERTO DUMA QUE NÃO DEVE
-/*check_not_scared_elem(ColumnNumber,LineNumayerTurnx,ScaredPiece):-
-      nth0(LineNumber,Board,Line),
-      nth0(ColumnNumber,Line,Elem),
-      write('Ulimto check:'),
-      write('ColumnNumber:'),
-        write(ColumnNumber),
-        write('LineNumber:'),
-        write(LineNumber),
-        write('Elem:'),
-        write(Elem),
-        write('PlayerTurn:'),
-        write(PlayerTurn),
-        nl,
-        !,
-        check_elem(Elem,PlayerTurn),
-        ScaredPiece=LineNumber-ColumnNumber,
-        write(ScaredPiece).
-*/
-
 check_scared_line(C,L,[Board,PlayerTurn],ScaredPiece):-
         \+check_not_scared_elem(C,L,Board,PlayerTurn),
         nth0(L,Board,Line),
@@ -336,19 +316,13 @@ check_scared_line(C,L,[Board,PlayerTurn],ScaredPiece):-
         ScaredPiece=L-C.
 
 check_scared_line(ElemNumber,LineNumber,[Board,PlayerTurn],ScaredPiece):-
-        ElemNumber\=9,
         LineNumber\=10,
         check_not_scared_elem(ElemNumber,LineNumber,Board,PlayerTurn),
-        var(ScaredPiece),
-        Next_Elem is ElemNumber+1,
-        check_scared_line(Next_Elem,LineNumber,[Board,PlayerTurn],ScaredPiece).
-
-check_scared_line(9,LineNumber,[Board,PlayerTurn],ScaredPiece):-
-        LineNumber\=9,
-        check_not_scared_elem(ElemNumber,LineNumber,Board,PlayerTurn),
-        var(ScaredPiece),
-        NextLie is LineNumber+1,
-        check_scared_line(0,NextLie,[Board,PlayerTurn],ScaredPiece).
+        var(ScaredPiece),   
+        (ElemNumber =:= 9 -> 
+        Next_Elem is 0,Next_Line is LineNumber+1;
+        Next_Elem is ElemNumber+1,Next_Line is LineNumber),
+        check_scared_line(Next_Elem,Next_Line,[Board,PlayerTurn],ScaredPiece).
 
 check_scared_line(9,9,[Board,PlayerTurn],ScaredPiece):-
         check_not_scared_elem(9,9,Board,PlayerTurn),
