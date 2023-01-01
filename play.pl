@@ -26,7 +26,6 @@ try_move(GameState,Move,NewGameState) :-
 make_a_move([Board,PlayerTurn],NewGameState) :-
     player(PlayerTurn,'Human'),
     repeat,
-
     catch((read_move(GameState,Move)),_,(write('Invalid input. Try again\n!'),fail)),
     try_move(GameState,Move,NewGameState),
     skip_line,!.

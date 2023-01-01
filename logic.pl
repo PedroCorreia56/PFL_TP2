@@ -1,5 +1,5 @@
 :- consult('display.pl').
-
+:-use_module(library(lists)).
 
 
 % move(+GameState,?Move,?NewGameState)
@@ -14,7 +14,13 @@ move([Board,PlayerTurn],SR-SC-ER-EC,[NewBoard,NewPlayerTurn]):-
 %
 % Checks if a move is valid in the current game state.
 can_move([Board,PlayerTurn],SR-SC-ER-EC):-
-    nth0_nested(SC,SR,Board,Player).
+        check_scared_board([Board,PlayerTurn],ScaredPiece),
+        var(ScaredPiece),
+        ntho(SR,Board,Line),
+        nth0(SC,Line,Elem),
+        Elem\=0,
+        check_elem(Elem,PlayerTurn),
+
   %  nth0_nested(ER,EC,Board,Player),
     
 
@@ -195,9 +201,6 @@ check_not_scared_elem(9,9,Board,PlayerTurn):-
         Elemleftdiagonal\=Scared,
         Elemleftdiagonal\=9+Scared.
 
-
-       % Next_Elem is 0+1,
-    %    check_not_scared_elem(Next_Elem,9,Board,PlredPiece).
     
 % Case for the first element of the other lines
 check_not_scared_elem(0,LineNumber,Board,PlayerTurn):-
@@ -263,7 +266,7 @@ check_not_scared_elem(9,LineNumber,Board,PlayerTurn):-
        % check_not_scared_elem(0,LinebellowNumber,Burn,ScaredPiece).
 
 % Case for elements between the first and the last of the other lines
-check_not_scared_elem(ColumnNumber,LineNumayerTurn,Board,PlayerTurn):-
+check_not_scared_elem(ColumnNumber,LineNumber,Board,PlayerTurn):-
         nonvar(LineNumber),
         nonvar(ColumnNumber),
         ColumnNumber\=0,
@@ -273,66 +276,59 @@ check_not_scared_elem(ColumnNumber,LineNumayerTurn,Board,PlayerTurn):-
         nth0(LineNumber,Board,Line),
         nth0(ColumnNumber,Line,Elem),
         check_elem(Elem,PlayerTurn),
-        scared_of(Elem,Scared), 
+        scared_of(Elem,Scared),
+
         ElemRightNumber is ColumnNumber+1,
         ElemLeftNumber is ColumnNumber-1,
         LineaboveNumber is LineNumber-1,
         LinebellowNumber is LineNumber+1,
         nth0(ElemRightNumber,Line,Elemright),
+
         Elemright\=Scared,
         Elemright\=9+Scared,
         nth0(ElemLeftNumber,Line,Elemleft),
+ 
         Elemleft\=Scared,
         Elemleft\=9+Scared,
         nth0(LinebellowNumber,Board,Linebellow),
         nth0(ColumnNumber,Linebellow,Elembellow),
+ 
         Elembellow\=Scared,
         Elembellow\=9+Scared,
         nth0(ElemRightNumber,Linebellow,Elemrightdiagonalbellow),
+   
         Elemrightdiagonalbellow\=Scared,
         Elemrightdiagonalbellow\=9+Scared,
         nth0(ElemLeftNumber,Linebellow,Elemleftdiagonalbellow),
+  
         Elemleftdiagonalbellow\=Scared,
         Elemleftdiagonalbellow\=9+Scared,
         nth0(LineaboveNumber,Board,Lineabove),
         nth0(ColumnNumber,Lineabove,Elemabove),
+  
         Elemabove\=Scared,
         Elemabove\=9+Scared,
         nth0(ElemRightNumber,Lineabove,Elemrightdiagonalabove),
+ 
         Elemrightdiagonalabove\=Scared,
         Elemrightdiagonalabove\=9+Scared,
         nth0(ElemLeftNumber,Lineabove,Elemleftdiagonalabove),
+    
         Elemleftdiagonalabove\=Scared,
         Elemleftdiagonalabove\=9+Scared.
      %   Next_Elem is ColumnNumber+1,
       %  check_not_scared_elem(Next_Elem,LineNumberrTurn,ScaredPiece).
 
 
-check_scared_line(C,L,[Board,PlayerTurn],ScaredPiece):-
-        C<10,
-        L<10,
-        var(ScaredPiece),
-        \+check_not_scared_elem(C,L,Board,PlayerTurn),
-        nth0(L,Board,Line),
-        nth0(C,Line,Elem),
-        Elem\=0,
-        write('BEFORE CEHCK'),
-        check_elem(Elem,PlayerTurn),
-        write('AFTER CEHCK'),
-        write('Elem:'),write(Elem),nl,
-        scared_of(Elem,Scared),
-        write('Scared:'),write(Scared),nl,
-        ScaredPiece=L-C,
-        write('COlumn:'),write(C),nl,
-        write('Line:'),write(L),nl.
+
 
 check_scared_line(9,9,[Board,PlayerTurn],ScaredPiece):-
         check_not_scared_elem(9,9,Board,PlayerTurn),
         var(ScaredPiece).
 
 check_scared_line(ElemNumber,LineNumber,[Board,PlayerTurn],ScaredPiece):-
-        write('1 ElemNumber: '),write(ElemNumber),nl,
-        write('1 LineNumber: '),write(LineNumber),nl,
+     %   write('1 ElemNumber: '),write(ElemNumber),nl,
+      %  write('1 LineNumber: '),write(LineNumber),nl,
         LineNumber\=10,
         \+check_not_scared_elem(ElemNumber,LineNumber,Board,PlayerTurn),
         var(ScaredPiece),   
@@ -342,8 +338,8 @@ check_scared_line(ElemNumber,LineNumber,[Board,PlayerTurn],ScaredPiece):-
         check_scared_line(Next_Elem,Next_Line,[Board,PlayerTurn],ScaredPiece).
 
 check_scared_line(ElemNumber,LineNumber,[Board,PlayerTurn],ScaredPiece):-
-        write('2 ElemNumber: '),write(ElemNumber),nl,
-        write('2 LineNumber: '),write(LineNumber),nl,
+        %write('2 ElemNumber: '),write(ElemNumber),nl,
+       % write('2 LineNumber: '),write(LineNumber),nl,
         LineNumber\=10,
         check_not_scared_elem(ElemNumber,LineNumber,Board,PlayerTurn),
         var(ScaredPiece),   
@@ -353,17 +349,24 @@ check_scared_line(ElemNumber,LineNumber,[Board,PlayerTurn],ScaredPiece):-
         check_scared_line(Next_Elem,Next_Line,[Board,PlayerTurn],ScaredPiece).
 
 
+check_scared_line(C,L,[Board,PlayerTurn],ScaredPiece):-
+        C=<9,
+        L=<9,
+        var(ScaredPiece),
+        \+check_not_scared_elem(C,L,Board,PlayerTurn),
+        nth0(L,Board,Line),
+        nth0(C,Line,Elem),
+        Elem\=0,
+        check_elem(Elem,PlayerTurn),
+        ScaredPiece=L-C.
 
 
 
 
-
-
-
-% check_scared(+GameState,+LineToCheck,-ScaredPiece)
+% check_scared_board(+GameState,+LineToCheck,-ScaredPiece)
 % check if any piece is near a piec they are scared of
-check_scared(GameState,ScaredPiece):-
-      \+check_scared_line(0,0,GameState,ScaredPiece).
+check_scared_board(GameState,ScaredPiece):-
+        check_scared_line(0,0,GameState,ScaredPiece).
 
 
 testee:-
@@ -381,3 +384,10 @@ teste3:-
         initial(1,[Board,PlayerTurn]),
         check_scared_line(0,0,[Board,1],ScaredPiece),
         nonvar(ScaredPiece),nl,write(ScaredPiece),nl.
+
+
+teste4:-
+        initial(1,[Board,PlayerTurn]),
+        findall(ScaredPiece,(\+check_scared_line(_,_,[Board,PlayerTurn],ScaredPiece)),List),
+        write(ScaredPiece),
+        write(List).

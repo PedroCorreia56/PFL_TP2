@@ -9,8 +9,8 @@ initial(1,[[
     [0,0,0,0,0,0,0,0,0,0],
     [0,0,0,9,0,0,9,0,0,0],
     [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,3,2,2,3,0,0,-3],
-    [0,0,0,0,1,1,0,0,0,2]],1]).
+    [0,0,0,3,2,2,3,0,0,0],
+    [0,0,0,0,1,1,0,0,0,0]],1]).
 
 % Pieces codes for board representation
 code(0,"  "). % space
@@ -20,16 +20,28 @@ code(2,"R1"). % rat player 1
 code(-2,"R2"). % rat player 2
 code(3,"L1"). % lion player 1
 code(-3,"L2"). % lion player 2
-code(4,"GO"). % goal 
+code(9,"GO"). % goal 
+code(10,"E1"). % elephant player 1 in goal
+code(8,"E2"). % elephant player 2 in goal
+code(11,"R1"). % rat player 1 in goal
+code(7,"R2"). % rat player 2 in goal
+code(12,"L1"). % lion player 1 in goal
+code(6,"L2"). % lion player 2 in goal
 
 % Whos scared of who
-scared_of(1,-2).
-scared_of(-1,2).
-scared_of(2,-3).
-scared_of(-2,3).
-scared_of(3,(-1)).
-scared_of(-3,1).
-scared_of(0,-111000).
+scared_of(1,-2).% rat scared of elephant
+scared_of(-1,2).% rat scared of elephant
+scared_of(2,-3).% lion scared of rat
+scared_of(-2,3).% lion scared of rat
+scared_of(3,(-1)).% elephant scared of lion
+scared_of(-3,1).% elephant scared of lion
+scared_of(0,-111000).% space is not scared of anything
+scared_of(11,-2), % rat in goal scared of elephant
+scared_of(7,2). % rat in goal scared of elephant
+scared_of(12,-3). % lion in goal scared of rat
+scared_of(6,3). % lion in goal scared of rat
+scared_of(10,(-1)). % elephant in goal scared of lion
+scared_of(8,1). % elephant in goal scared of lion
 
 
 column(0, '0').
