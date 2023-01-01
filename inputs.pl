@@ -73,7 +73,9 @@ read_number(LowerBound, UpperBound, Number):-
 % @param Move with valid notation
 read_move([Board,PlayerTurn],Move):-
     read_move_aux(X),
-    (parse_move(X,Board,Move)->!;write('Invalid move, try again\n'),read_move([Board,PlayerTurn],Move)).
+    (parse_move(X,Board,Move)->
+    !;
+    write('Invalid move, try again\n'),write('Move READ:'),write(Move),read_move([Board,PlayerTurn],Move)).
 
 % check_code(+Code,+Len,-Char)
 % Checks if the code is valid and returns the respective char
@@ -120,20 +122,45 @@ check_row(Row,CharCode):-
 % Where SR-SC-ER-EC are the start and end row and column
 parse_move(X,Board,SR-SC-ER-EC):-
     length(X,Len),
+    write('Len: '),
+    write(Len),nl,
     Len =:= 5,
+    write(X),
     nth0(0,X,Srr),
+    write('Srr: '),
+    write(Srr),nl,
     char_code(R,Srr),
+    write('R: '),
+    write(R),nl,
     check_row(SR,R),
+    write('SR: '),
+    write(SR),nl,
     nth0(1,X,Scc),
+    write('Scc: '),
+    write(Scc),nl,
     char_code(C,Scc),
+    write('C: '),
+    write(C),nl,
     column(SC,C),
+    write('SC: '),
+    write(SC),nl,
     nth0(3,X,Err),
+    write('Err: '),
+    write(Err),nl,
     char_code(Re,Err),
+    write('Re: '),
+    write(Re),nl,
     check_row(ER,Re),
+    write('ER: '),
+    write(ER),nl,
     nth0(4,X,ECc),
+    write('ECc: '),
+    write(ECc),nl,
     char_code(D,ECc),
-    column(EC,D).
- 
-    
-    
-   
+    write('D: '),
+    write(D),nl,
+    column(EC,D),
+    write('EC: '),
+    write(EC),nl,
+    write('Move: '),
+    write(SR-SC-ER-EC),nl.

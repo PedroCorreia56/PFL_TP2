@@ -122,5 +122,5 @@ pp_menu(1):-
     initial(1,GameState),
     assert(player(1,'Human')),
     assert(player(2,'Human')),
-    start_game(GameState),
-    menu.
+    start_game(GameState).
+   % menu.

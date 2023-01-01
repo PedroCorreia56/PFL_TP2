@@ -1,28 +1,30 @@
 :- consult('display.pl').
 :-use_module(library(lists)).
 
+free_space(0).
+free_space(9).
 
-% move(+GameState,?Move,?NewGameState)
-%
-% Executes a move using a game state and returning a new state.
-% A move has the form CurrentPosition-NewPosition
-% A positon has the form Column-Row.
-move([Board,PlayerTurn],SR-SC-ER-EC,[NewBoard,NewPlayerTurn]):-
-    can_move([Board,PlayerTurn],SR-SC-ER-EC).
 
-% can_move(+GameState,?Move)
-%
-% Checks if a move is valid in the current game state.
-can_move([Board,PlayerTurn],SR-SC-ER-EC):-
-        check_scared_board([Board,PlayerTurn],ScaredPiece),
-        var(ScaredPiece),
-        ntho(SR,Board,Line),
-        nth0(SC,Line,Elem),
-        Elem\=0,
-        check_elem(Elem,PlayerTurn),
 
-  %  nth0_nested(ER,EC,Board,Player),
-    
+write_scared_piece(SR-SC):-
+        row(SR,Row),
+        column(SC,Column),
+        write(Row),
+        write(Column).
+
+piece_original_value(1,1).
+piece_original_value(2,2).
+piece_original_value(3,3).
+piece_original_value(-1,-1).
+piece_original_value(-2,-2).
+piece_original_value(-3,-3).
+piece_original_value(10,1).
+piece_original_value(11,2).
+piece_original_value(12,3).
+piece_original_value(8,-1).
+piece_original_value(7,-2).
+piece_original_value(6,-3).
+
 
 % check_elem(+Elem,+PlayerTurn)
 % check if the element is the same as the player turn
@@ -43,6 +45,88 @@ check_elem(Elem,2):-
         Elem\=1,
         Elem\=2,
         Elem\=3.
+
+change_turn(2,1).
+change_turn(1,2).
+/**
+ * replace_m_n(+Board, +L, +C, +Player, -NewBoard)
+ * 
+ * put a new piece in line L and Colunm C of Board
+ */
+replace_m_n(Board, L, C, Player, NewBoard) :-
+    replace_nth(L, Old1, New1, Board, NewBoard),
+    replace_nth(C, _OldElem2, Player, Old1, New1).
+
+/**
+ * replace_nth(+N, -OldElem, +Player, +List, -List2)
+ *
+ * replaces an element of a list. Will be auxiliar to function replace_m_n
+ */
+replace_nth(N, OldElem, Player, List, List2) :-
+    length(L1, N),
+    append(L1, [OldElem|Rest], List),
+    append(L1, [Player|Rest], List2). 
+
+
+
+
+% move(+GameState,?Move,?NewGameState)
+%
+% Executes a move using a game state and returning a new state.
+% A move has the form CurrentPosition-NewPosition
+% A positon has the form Column-Row.
+move([Board,PlayerTurn],SR-SC-ER-EC,[NewBoard,NewPlayerTurn]):-
+        can_move([Board,PlayerTurn],SR-SC-ER-EC,ScaredPiece),
+        write('Entered:'),nl,
+        nth0(SR,Board,Line),
+        nth0(SC,Line,StartElem),
+        nth0(ER,Board,EndLine),
+        nth0(EC,Line,EndElem),
+        piece_original_value(StartElem,Temp),
+        write('After piece_original_value:'),nl,
+        NewEndElem is EndElem +Temp,
+        NewStartElem is StartElem-Temp,
+        replace_m_n(Board,SR,SC,NewStartElem,TempBoard),
+        write('Old Board: '),nl,
+        write(Board),nl,
+        write('Temp Board: '),nl,
+        write(TempBoard),nl,
+       
+        replace_m_n(TempBoard,ER,EC,NewEndElem,NewBoard), 
+        write('New Board: '),nl,
+        write(NewBoard),nl,
+        change_turn(PlayerTurn,NewPlayerTurn).
+
+% can_move(+GameState,?Move)
+%
+% Checks if a move is valid in the current game state.
+can_move(GameState,SR-SC-ER-EC,ScaredPiece):-
+        check_scared_board(GameState,ScaredPiece),
+        nonvar(ScaredPiece),
+        write('Need to move Piece in: '),
+        write_scared_piece(ScaredPiece),nl,
+        fail.
+
+can_move([Board,PlayerTurn],SR-SC-ER-EC,ScaredPiece):-
+        check_scared_board([Board,PlayerTurn],ScaredPiece),
+        var(ScaredPiece),
+        nth0(SR,Board,Line),
+        nth0(SC,Line,StartElem),
+        StartElem\=0,
+        check_elem(StartElem,PlayerTurn),
+        nth0(ER,Board,EndLine),
+        nth0(EC,Line,EndElem),
+        StartElem\=EndElem,
+        free_space(EndElem).
+
+ 
+% check_scared_board(+GameState,+LineToCheck,-ScaredPiece)
+% check if any piece is near a piec they are scared of
+check_scared_board(GameState,ScaredPiece):-
+        check_scared_line(0,0,GameState,ScaredPiece).
+
+
+
 
 % check_not_scared_elem(+ColumnNumber,+LineN,+PlayerTurn,-ScaredPiece)
 % check if any piece is near a piec they are scared of and returns the piece if it is
@@ -363,10 +447,6 @@ check_scared_line(C,L,[Board,PlayerTurn],ScaredPiece):-
 
 
 
-% check_scared_board(+GameState,+LineToCheck,-ScaredPiece)
-% check if any piece is near a piec they are scared of
-check_scared_board(GameState,ScaredPiece):-
-        check_scared_line(0,0,GameState,ScaredPiece).
 
 
 testee:-
@@ -386,8 +466,23 @@ teste3:-
         nonvar(ScaredPiece),nl,write(ScaredPiece),nl.
 
 
+
 teste4:-
         initial(1,[Board,PlayerTurn]),
         findall(ScaredPiece,(\+check_scared_line(_,_,[Board,PlayerTurn],ScaredPiece)),List),
         write(ScaredPiece),
         write(List).
+teste5:-
+        initial(1,[Board,PlayerTurn]),
+        move([Board,PlayerTurn],9-4-9-3,NewGameState).
+
+teste6:-
+        initial(1,[Board,PlayerTurn]),
+        can_move([Board,PlayerTurn],9-4-9-4,ScaredPiece),
+        write(ScaredPiece),nl.
+        
+teste7:-
+        initial(1,[Board,PlayerTurn]),
+        write(Board),nl,
+        replace_m_n(Board, 9, 9, -3, N), write('depois de substituir'), nl, write(N).
+
