@@ -6,6 +6,13 @@ free_space(9).
 
 
 
+% abs(+X,-AX)
+% returns the absolute value of X
+% had to make one because the one in the library was not working.
+abs(X,X):-X>0.
+abs(X,AX):- X=<0, AX is 0-X.
+
+
 write_scared_piece(SR-SC):-
         row(SR,Row),
         column(SC,Column),
@@ -25,6 +32,19 @@ piece_original_value(8,-1).
 piece_original_value(7,-2).
 piece_original_value(6,-3).
 
+% Used to help checking the piece movement ignoring the player turn
+piece_value_helper(1,1).
+piece_value_helper(2,2).
+piece_value_helper(3,3).
+piece_value_helper(-1,1).
+piece_value_helper(-2,2).
+piece_value_helper(-3,3).
+piece_value_helper(10,1).
+piece_value_helper(11,2).
+piece_value_helper(12,3).
+piece_value_helper(8,1).
+piece_value_helper(7,2).
+piece_value_helper(6,3).
 
 % check_elem(+Elem,+PlayerTurn)
 % check if the element is the same as the player turn
@@ -108,9 +128,30 @@ can_move([Board,PlayerTurn],SR-SC-ER-EC,ScaredPiece):-
         nth0(ER,Board,EndLine),
         nth0(EC,Line,EndElem),
         StartElem\=EndElem,
-        free_space(EndElem).
+        free_space(EndElem),
+        piece_value_helper(StartElem,Temp),
+        piece_movement(Temp,Board,SR-SC-ER-EC).
 
- 
+% piece_movement(+Type,+Board,+StartRow-StartColumn-EndRow-EndColumn)
+% checks if the piece can move to the desired position
+% This is the case for the lion that can only move diagonally
+piece_movement(3,Board,SR-SC-ER-EC):-
+        ColumnDiff is SC-EC,
+        RowDiff is SR-ER,
+        abs(ColumnDiff,AColumnDiff),
+        abs(RowDiff,ARowDiff),
+        AColumnDiff=:=ARowDiff.
+
+% This is the case for the rat that can only move vertically or horizontally
+piece_movement(2,Board,SR-SC-ER-EC):-
+        SR=:=ER;SC=:=EC.
+
+% This is the case for the elephant that can move in any direction
+piece_movement(1,Board,SR-SC-ER-EC).
+
+
+
+
 % check_scared_board(+GameState,+LineToCheck,-ScaredPiece)
 % check if any piece is near a piec they are scared of
 check_scared_board(GameState,ScaredPiece):-
@@ -476,4 +517,9 @@ teste7:-
         initial(1,[Board,PlayerTurn]),
         write(Board),nl,
         replace_m_n(Board, 9, 9, -3, N), write('depois de substituir'), nl, write(N).
+
+
+testemove:-
+        initial(1,[Board,PlayerTurn]),
+        piece_movement(2,Board,9-9-9-8).
 
