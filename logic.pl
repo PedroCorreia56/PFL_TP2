@@ -126,10 +126,7 @@ move([Board,PlayerTurn],SR-SC-ER-EC,[NewBoard,NewPlayerTurn]):-
 %
 % Checks if a move is valid in the current game state.
 can_move(GameState,SR-SC-ER-EC):-
-        write('Before check scared board'),nl,
         check_scared_board(GameState,ScaredPiece),
-        write('After check scared board'),nl,
-        write('ScaredPiece: '),
         write_scared_piece(ScaredPiece),nl,
         nonvar(ScaredPiece),
         \+compare_scare_piece(ScaredPiece,SR,SC),
@@ -175,7 +172,7 @@ check_clear_path(2,Board,RowInd,ColInd,SR-SC-ER-EC):-
 % This one is right horizontal movement
 check_clear_path(2,Board,RowInd,ColInd,SR-SC-ER-EC):-
         RowInd =:= 0,
-        ColInd =< -1,
+        ColInd =< (-1),
         nth0(SR,Board,Line),
         NextCol is SC+1,
         nth0(NextCol,Line,Elem),
@@ -185,25 +182,25 @@ check_clear_path(2,Board,RowInd,ColInd,SR-SC-ER-EC):-
 
 % This one is up vertical movement
 check_clear_path(2,Board,RowInd,ColInd,SR-SC-ER-EC):-
-        RowInd =< -1,
+        RowInd >= 1 ,
         ColInd =:=0,
         NextLine is SR+(-1),
         nth0(NextLine,Board,Line),
         nth0(SC,Line,Elem),
         free_space(Elem),
-        NewRowInd is RowInd+1,
+        NewRowInd is RowInd+(-1),
         check_clear_path(2,Board,NewRowInd,ColInd,NextLine-SC-ER-EC).
         
 
 % This one is down vertical movement
 check_clear_path(2,Board,RowInd,ColInd,SR-SC-ER-EC):-
-        RowInd >= 1,
+        RowInd =< (-1),
         ColInd =:=0,
         NextLine is SR+1,
         nth0(NextLine,Board,Line),
         nth0(SC,Line,Elem),
         free_space(Elem),
-        NewRowInd is RowInd-1,
+        NewRowInd is RowInd+1,
         check_clear_path(2,Board,NewRowInd,ColInd,NextLine-SC-ER-EC).
 
 
@@ -228,7 +225,7 @@ check_clear_path(3,Board,RowInd,ColInd,SR-SC-ER-EC):-
 
 % This one is diagonal down left movement, ex: 8-8 -> 9-7
 check_clear_path(3,Board,RowInd,ColInd,SR-SC-ER-EC):-
-        RowInd =< -1,
+        RowInd =< (-1),
         ColInd >= 1,
         NextLine is SR+1,
         NextCol is SC+(-1),
@@ -283,7 +280,7 @@ piece_movement(3,Board,SR-SC-ER-EC):-
 piece_movement(2,Board,SR-SC-ER-EC):-
         RowInd is SR-ER,
         ColInd is SC-EC,
-        SR=:=ER;SC=:=EC,
+        (SR=:=ER;SC=:=EC),
         check_clear_path(2,Board,RowInd,ColInd,SR-SC-ER-EC).
         
 
@@ -291,11 +288,15 @@ piece_movement(2,Board,SR-SC-ER-EC):-
 piece_movement(1,Board,SR-SC-ER-EC):-
         ColumnDiff is SC-EC,
         RowDiff is SR-ER,
-        abs(ColumnDiff,AColumnDiff),
-        abs(RowDiff,ARowDiff),
-        AColumnDiff=:=ARowDiff;SR=:=ER;SC=:=EC,
-        check_clear_path(2,Board,RowDiff,ColumnDiff,SR-SC-ER-EC); 
-        check_clear_path(3,Board,RowDiff,ColumnDiff,SR-SC-ER-EC).
+        Tmp1 is ColumnDiff,
+        Tmp2 is RowDiff,
+        Tmp3 is ColumnDiff,
+        Tmp4 is RowDiff,
+        abs(Tmp1,AColumnDiff),
+        abs(Tmp2,ARowDiff),
+        (AColumnDiff=:=ARowDiff;SR=:=ER;SC=:=EC),
+        (check_clear_path(2,Board,RowDiff,ColumnDiff,SR-SC-ER-EC); 
+        check_clear_path(3,Board,Tmp4,Tmp3,SR-SC-ER-EC)).
 
 % check_scared_board(+GameState,+LineToCheck,-ScaredPiece)
 % check if any piece is near a piec they are scared of
@@ -681,9 +682,9 @@ testecheck1:-
         piece_movement(1,Board,9-4-9-2),
         write('Passed Left movement'),nl,
         % cant move right from 9-4
-        write('Right movement'),nl,
+        write('Denied Right movement'),nl,
         \+piece_movement(1,Board,9-4-9-8),
-        write('Passed Right movement'),nl,
+        write('Denied Passed Right movement'),nl,
         % cant move up from 9-4
         write('Denied Up movement'),nl,
         \+piece_movement(1,Board,9-4-7-4),
@@ -699,33 +700,33 @@ testecheck2:-
         initial(1,[Board,PlayerTurn]),
         % can only move up from 8-4
         write('Up movemnt'),nl,
-        piece_movement(2,Board,8-4-6-4).
+        piece_movement(2,Board,8-4-6-4),
         write(' PASSED Up movemnt'),nl,
         % cant move down from 8-4
         write('Denied Down movemnt'),nl,
-        \+piece_movement(2,Board,8-4-9-4).
+        \+piece_movement(2,Board,8-4-9-4),
         write(' PASSED Denied Down movemnt'),nl.
         write('Denied Left movement'),nl,
-        \+piece_movement(2,Board,8-4-8-2).
+        \+piece_movement(2,Board,8-4-8-2),
         write(' PASSED Denied Left movement'),nl.
         write('Denied Right movement'),nl,
-        \+piece_movement(2,Board,8-4-8-6).
+        \+piece_movement(2,Board,8-4-8-6),
         write(' PASSED Denied Right movement'),nl,
         write('Denied Diagonal up left movement'),nl,
-        \+piece_movement(2,Board,8-4-6-2).
+        \+piece_movement(2,Board,8-4-6-2),
         write(' PASSED Denied Diagonal up left movement'),nl,
         write('Denied Diagonal up right movement'),nl,
-        \+piece_movement(2,Board,8-4-6-6).
+        \+piece_movement(2,Board,8-4-6-6),
         write(' PASSED Denied Diagonal up right movement'),nl.
         write('Denied Diagonal down left movement'),nl,
-        \+piece_movement(2,Board,8-4-9-3).
-        write(' PASSED Denied Diagonal down left movement'),nl,
+        \+piece_movement(2,Board,8-4-9-3),
+        write(' PASSED Denied Diagonal down left movement'),nl.
 
 testecheck22:-
         initial(1,[Board,PlayerTurn]),
         % can only move up from 8-4
         write('Up movemnt'),nl,
-        piece_movement(2,Board,8-4-6-4).
+        piece_movement(2,Board,8-4-6-4),
         write(' PASSED Up movemnt'),nl,
         write('down movement'),nl,
         piece_movement(2,Board,2-4-4-4),
