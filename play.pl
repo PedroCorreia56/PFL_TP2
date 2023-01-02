@@ -1,6 +1,3 @@
-:- consult('display.pl').
-
-
 %play/0
 %main predicate for game start, presents the main menu
 play :-
@@ -38,7 +35,7 @@ process_result([NewBoard,NewPlayerTurn],'Player'):-
     sleep(5),clear.
 % Case if the game is not over
 process_result(NewGameState,'none'):-
-    clear, 
+    %clear, 
     display_game(NewGameState),
     game_loop(NewGameState).
 
@@ -72,7 +69,7 @@ make_a_move([Board,PlayerTurn],NewGameState) :-
 % game_over(+GameState, -Result)
 % checks if the game is over, if so sends the result
 game_over([Board,PlayerTurn],Result) :-
-    write('In game over'),nl,
+    % write('In game over'),nl,
     count_pieces_in_goal(Board,Result).
 
 

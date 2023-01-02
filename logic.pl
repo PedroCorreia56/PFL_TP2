@@ -20,19 +20,11 @@ write_scared_piece(SR-SC):-
         write(Column).
 
 compare_scare_piece(X-Y,SR,SC):-
-        write('X: '),
-        write(X),nl,
-        write('Y: '),
-        write(Y),nl,
-        write('SR: '),
-        write(SR),nl,
-        write('SC: '),
-        write(SC),nl,
         X=:=SR,
         Y=:=SC.
 
+piece_original_value(0,0).
 
-piece_original_value(1,1).
 piece_original_value(2,2).
 piece_original_value(3,3).
 piece_original_value(-1,-1).
@@ -44,6 +36,8 @@ piece_original_value(12,3).
 piece_original_value(8,-1).
 piece_original_value(7,-2).
 piece_original_value(6,-3).
+piece_original_value(9,9).
+piece_original_value(1,1).
 
 % Used to help checking the piece movement ignoring the player turn
 piece_value_helper(1,1).
@@ -109,12 +103,13 @@ replace_nth(N, OldElem, Player, List, List2) :-
 % A move has the form CurrentPosition-NewPosition
 % A positon has the form Column-Row.
 move([Board,PlayerTurn],SR-SC-ER-EC,[NewBoard,NewPlayerTurn]):-
-        write('Befre can move'),nl,
-        can_move([Board,PlayerTurn],SR-SC-ER-EC),
+        write('Before can move'),nl,
+        can_move([Board,PlayerTurn],SR-SC-ER-EC,ScaredPiece),
+        write('After can move'),nl,
         nth0(SR,Board,Line),
         nth0(SC,Line,StartElem),
         nth0(ER,Board,EndLine),
-        nth0(EC,Line,EndElem),
+        nth0(EC,EndLine,EndElem),
         piece_original_value(StartElem,Temp),
         NewEndElem is EndElem +Temp,
         NewStartElem is StartElem-Temp,
@@ -125,21 +120,21 @@ move([Board,PlayerTurn],SR-SC-ER-EC,[NewBoard,NewPlayerTurn]):-
 % can_move(+GameState,?Move)
 %
 % Checks if a move is valid in the current game state.
-can_move(GameState,SR-SC-ER-EC):-
+
+can_move(GameState,SR-SC-ER-EC,ScaredPiece):-
         check_scared_board(GameState,ScaredPiece),
-        write_scared_piece(ScaredPiece),nl,
+       % write('Scared Piece: '),
+      %  write_scared_piece(ScaredPiece),nl,
         nonvar(ScaredPiece),
-        \+compare_scare_piece(ScaredPiece,SR,SC),
+        \+compare_scare_piece(ScaredPiece,SR,SC), 
+        !,
         write('Need to move Piece in: '),
         write_scared_piece(ScaredPiece),nl,
         fail.
 
-
-
-% ScR-ScC is the position of the scared piece
-can_move([Board,PlayerTurn],SR-SC-ER-EC):-
+can_move([Board,PlayerTurn],SR-SC-ER-EC,ScaredPiece):-
         check_scared_board([Board,PlayerTurn],ScaredPiece),
-        (nonvar(ScaredPiece)->compare_scare_piece(ScaredPiece,SR,SC);true),
+        (nonvar(ScaredPiece)->compare_scare_piece(ScaredPiece,SR,SC);var(ScaredPiece)),
         nth0(SR,Board,Line),
         nth0(SC,Line,StartElem),
         StartElem\=0,
@@ -148,8 +143,222 @@ can_move([Board,PlayerTurn],SR-SC-ER-EC):-
         nth0(EC,EndLine,EndElem),
         StartElem\=EndElem,
         free_space(EndElem),
+        scared_of(StartElem,Scared),
+        not_near_scared(EC,ER,Board,Scared),
         piece_value_helper(StartElem,Temp),
         piece_movement(Temp,Board,SR-SC-ER-EC).
+
+
+
+
+% scared_of(+Piece,-ScaredPiece)
+% Checks if a move ending position is near a scared piece
+not_near_scared(0,0,Board,Scared):-
+        nth0(0,Board,Line),
+        nth0(0,Line,Elem),
+        RightElemNumber is 1,
+        nth0(RightElemNumber,Line,RightElem),
+        piece_original_value(RightElem,RightElem2),
+        RightElem2\=Scared,
+        DownElemNumber is 0+1,
+        nth0(DownElemNumber,Board,DownLine),
+        nth0(0,DownLine,DownElem),
+        piece_original_value(DownElem,DownElem2),
+        DownElem2\=Scared,
+        nth0(1,DownLine,DownRightElem),
+        piece_original_value(DownRightElem,DownRightElem2),
+        DownRightElem2\=Scared.
+not_near_scared(9,0,Board,Scared):-
+        nth0(0,Board,Line),
+        nth0(9,Line,Elem),
+        LeftElemNumber is 9-1,
+        nth0(LeftElemNumber,Line,LeftElem),
+        piece_original_value(LeftElem,LeftElem2),
+        LeftElem2\=Scared,
+        DownLineNumber is 0+1,
+        nth0(DownLineNumber,Board,DownLine),
+        nth0(9,DownLine,DownElem),
+        piece_original_value(DownElem,DownElem2),
+        DownElem2\=Scared,
+        nth0(8,DownLine,DownLeftElem),
+        piece_original_value(DownLeftElem,DownLeftElem2),
+        DownLeftElem2\=Scared.
+
+not_near_scared(C,0,Board,Scared):-
+        C>=1,
+        C=<8,
+        nth0(0,Board,Line),
+        nth0(C,Line,Elem),
+        RightElemNumber is C+1,
+        nth0(RightElemNumber,Line,RightElem),
+        piece_original_value(RightElem,RightElem2),
+        RightElem2\=Scared,
+        LeftElemNumber is C-1,
+        nth0(LeftElemNumber,Line,LeftElem),
+        piece_original_value(LeftElem,LeftElem2),
+        LeftElem2\=Scared,
+        DownElemNumber is 0+1,
+        nth0(DownElemNumber,Board,DownLine),
+        nth0(C,DownLine,DownElem),
+        piece_original_value(DownElem,DownElem2),
+        DownElem2\=Scared,
+        DownRightElemNumber is C+1,
+        nth0(DownRightElemNumber,DownLine,DownRightElem),
+        piece_original_value(DownRightElem,DownRightElem2),
+        DownRightElem2\=Scared,
+        nth0(LeftElemNumber,DownElem,DownLeftElem),
+        piece_original_value(DownLeftElem,DownLeftElem2),
+        DownLeftElem2\=Scared.
+
+not_near_scared(0,9,Board,Scared):-
+        nth0(9,Board,Line),
+        nth0(0,Line,Elem),
+        RightElemNumber is 0+1,
+        nth0(RightElemNumber,Line,RightElem),
+        piece_original_value(RightElem,RightElem2),
+        RightElem2\=Scared,
+        UpLineNumber is 9-1,
+        nth0(UpLineNumber,Board,UpLine),
+        nth0(0,UpLine,UpElem),
+        UpElem\=Scared,
+        nth0(1,UpLine,UpRightElem),
+        piece_original_value(UpRightElem,UpRightElem2),
+        UpRightElem2\=Scared.
+
+not_near_scared(C,9,Board,Scared):-
+        C>=1,
+        C=<8,
+        nth0(9,Board,Line),
+        nth0(C,Line,Elem),
+        RightElemNumber is C+1,
+        nth0(RightElemNumber,Line,RightElem),
+        piece_original_value(RightElem,RightElem2),
+        RightElem2\=Scared,
+        LeftElemNumber is C-1,
+        nth0(LeftElemNumber,Line,LeftElem),
+        piece_original_value(LeftElem,LeftElem2),
+        LeftElem2\=Scared,
+        UpElemNumber is 9-1,
+        nth0(UpElemNumber,Board,UpLine),
+        nth0(C,UpLine,UpElem),
+        piece_original_value(UpElem,UpElem2),
+        UpElem2\=Scared,
+        UpRightElemNumber is C+1,
+        nth0(UpRightElemNumber,UpLine,UpRightElem),
+        piece_original_value(UpRightElem,UpRightElem2),
+        UpRightElem2\=Scared,
+        nth0(LeftElemNumber,UpElem,UpLeftElem),
+        piece_original_value(UpLeftElem,UpLeftElem2),
+        UpLeftElem2\=Scared.
+
+not_near_scared(9,9,Board,Scared):-
+        nth0(9,Board,Line),
+        nth0(9,Line,Elem),
+        LeftElemNumber is 9-1,
+        nth0(LeftElemNumber,Line,LeftElem),
+        piece_original_value(LeftElem,LeftElem2),
+        LeftElem2\=Scared,
+        UpElemNumber is 9-1,
+        nth0(UpElemNumber,Board,UpLine),
+        nth0(9,UpLine,UpElem),
+        piece_original_value(UpElem,UpElem2),
+        UpElem2\=Scared,
+        nth0(8,UpLine,UpLeftElem),
+        piece_original_value(UpLeftElem,UpLeftElem2),
+        UpLeftElem2\=Scared.
+
+not_near_scared(0,R,Board,Scared):-
+        R>=1,
+        R=<8,
+        nth0(R,Board,Line),
+        nth0(0,Line,Elem),
+        RightElemNumber is 0+1,
+        nth0(RightElemNumber,Line,RightElem),
+        piece_original_value(RightElem,RightElem2),
+        RightElem2\=Scared,
+        DownElemNumber is R+1,
+        nth0(DownElemNumber,Board,DownLine),
+        nth0(0,DownLine,DownElem),
+        piece_original_value(DownElem,DownElem2),
+        DownElem2\=Scared,
+        nth0(1,DownLine,DownRightElem),
+        piece_original_value(DownRightElem,DownRightElem2),
+        DownRightElem2\=Scared,
+        UpElemNumber is R-1,
+        nth0(UpElemNumber,Board,UpLine),
+        nth0(0,UpLine,UpElem),
+        piece_original_value(UpElem,UpElem2),
+        UpElem2\=Scared,
+        nth0(1,UpLine,UpRightElem),
+        piece_original_value(UpRightElem,UpRightElem2),
+        UpRightElem2\=Scared.
+
+not_near_scared(9,R,Board,Scared):-
+        R>=1,
+        R=<8,
+        nth0(R,Board,Line),
+        nth0(9,Line,Elem),
+        LeftElemNumber is 9-1,
+        nth0(LeftElemNumber,Line,LeftElem),
+        piece_original_value(LeftElem,LeftElem2),
+        LeftElem2\=Scared,
+        DownElemNumber is R+1,
+        nth0(DownElemNumber,Board,DownLine),
+        nth0(9,DownLine,DownElem),
+        piece_original_value(DownElem,DownElem2),
+        DownElem2\=Scared,
+        nth0(8,DownLine,DownLeftElem),
+        piece_original_value(DownLeftElem,DownLeftElem2),
+        DownLeftElem2\=Scared,
+        UpElemNumber is R-1,
+        nth0(UpElemNumber,Board,UpLine),
+        nth0(9,UpLine,UpElem),
+        piece_original_value(UpElem,UpElem2),
+        UpElem2\=Scared,
+        nth0(8,UpLine,UpLeftElem),
+        piece_original_value(UpLeftElem,UpLeftElem2),
+        UpLeftElem2\=Scared.
+
+not_near_scared(C,R,Board,Scared):-
+        C>=1,
+        C=<8,
+        R>=1,
+        R=<8,
+        nth0(R,Board,Line),
+        nth0(C,Line,Elem),
+        RightElemNumber is C+1,
+        nth0(RightElemNumber,Line,RightElem),
+        piece_original_value(RightElem,RightElem2),
+        RightElem2\=Scared,
+        LeftElemNumber is C-1,
+        nth0(LeftElemNumber,Line,LeftElem),
+        piece_original_value(LeftElem,LeftElem2),
+        LeftElem2\=Scared,
+        DownLineNumber is R+1,
+        nth0(DownLineNumber,Board,DownLine),
+        nth0(C,DownLine,DownElem),
+        piece_original_value(DownElem,DownElem2),
+        DownElem2\=Scared,
+        DownRightElemNumber is C+1,
+        nth0(DownRightElemNumber,DownLine,DownRightElem),
+        piece_original_value(DownRightElem,DownRightElem2),
+        DownRightElem2\=Scared,
+        DownLeftElemNumber is C-1,
+        nth0(LeftElemNumber,DownLine,DownLeftElem),
+        piece_original_value(DownLeftElem,DownLeftElem2),
+        DownLeftElem2\=Scared,
+        UpElemNumber is R-1,
+        nth0(UpElemNumber,Board,UpLine),
+        nth0(C,UpLine,UpElem),
+        piece_original_value(UpElem,UpElem2),
+        UpElem2\=Scared,
+        UpRightElemNumber is C+1,
+        nth0(UpRightElemNumber,UpLine,UpRightElem),
+         piece_original_value(UpRightElem,UpRightElem2),
+        UpRightElem2\=Scared,
+        nth0(LeftElemNumber,UpLine,UpLeftElem),
+        piece_original_value(UpLeftElem,UpLeftElem2),
+        UpLeftElem2\=Scared.
 
 % Direita-> RowInd =:= 0, ColInd =< -1
 % Esquerda-> RowInd =:= 0, ColInd >= 1
@@ -653,12 +862,11 @@ teste4:-
         write(List).
 teste5:-
         initial(1,[Board,PlayerTurn]),
-        move([Board,PlayerTurn],9-9-9-7,NewGameState).
+        move([Board,PlayerTurn],8-5-3-5,NewGameState).
 
 teste6:-
         initial(1,[Board,PlayerTurn]),
-        can_move([Board,PlayerTurn],9-4-9-4,ScaredPiece),
-        write(ScaredPiece),nl.
+        can_move([Board,PlayerTurn],9-4-9-3).
         
 teste7:-
         initial(1,[Board,PlayerTurn]),
