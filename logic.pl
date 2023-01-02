@@ -77,24 +77,15 @@ replace_nth(N, OldElem, Player, List, List2) :-
 % A positon has the form Column-Row.
 move([Board,PlayerTurn],SR-SC-ER-EC,[NewBoard,NewPlayerTurn]):-
         can_move([Board,PlayerTurn],SR-SC-ER-EC,ScaredPiece),
-        write('Entered:'),nl,
         nth0(SR,Board,Line),
         nth0(SC,Line,StartElem),
         nth0(ER,Board,EndLine),
         nth0(EC,Line,EndElem),
         piece_original_value(StartElem,Temp),
-        write('After piece_original_value:'),nl,
         NewEndElem is EndElem +Temp,
         NewStartElem is StartElem-Temp,
         replace_m_n(Board,SR,SC,NewStartElem,TempBoard),
-        write('Old Board: '),nl,
-        write(Board),nl,
-        write('Temp Board: '),nl,
-        write(TempBoard),nl,
-       
         replace_m_n(TempBoard,ER,EC,NewEndElem,NewBoard), 
-        write('New Board: '),nl,
-        write(NewBoard),nl,
         change_turn(PlayerTurn,NewPlayerTurn).
 
 % can_move(+GameState,?Move)
