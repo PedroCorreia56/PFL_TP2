@@ -1,7 +1,7 @@
 
 % clear/0
 % Clears the screen, for better user experience
-clear:- write('\33\[2J').
+clear :- write('\e[2J').
 
 % menu_header_format(+Header)
 % prints the header of a menu, for example MAIN MENU or INSTRUCTIONS

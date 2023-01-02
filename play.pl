@@ -27,8 +27,9 @@ game_loop(GameState):-
     game_over(NewGameState,Result),
     process_result(NewGameState,Result).
 
-% game_over(+GameState, -Result)
-% checks if the game is over, if so outputs the result
+% process_result(+GameState,+Result)
+% processes the result of the game, 
+% if the game is over, Result='Player', displays the winner
 process_result([NewBoard,NewPlayerTurn],'Player'):-
     clear,
     display_game([NewBoard,NewPlayerTurn]),
@@ -61,14 +62,17 @@ make_a_move([Board,PlayerTurn],NewGameState) :-
     skip_line,!.
 
 % computer move
+/*
 make_a_move([Board,PlayerTurn],NewGameState) :-
     player(PlayerTurn,'Computer'),
     %TODO
     computer_move(GameState,NewGameState).
+*/
 
-
-
+% game_over(+GameState, -Result)
+% checks if the game is over, if so sends the result
 game_over([Board,PlayerTurn],Result) :-
+    write('In game over'),nl,
     count_pieces_in_goal(Board,Result).
 
 
@@ -85,9 +89,7 @@ result(_,'none').
 % if the number of pieces is >=3, or <=-3 then the game is over
 count_pieces_in_goal(Board,Result) :-
     check_line(0,0,Board,0,Count),
-    write('Count: '),write(Count),nl,
-    result(Count,Result),
-    write('Result: '),write(Result),nl.
+    result(Count,Result).
 
 
 
@@ -96,7 +98,6 @@ check_line(C,L,Board,Count,FinalCount):-
     L=<9,
     check_column(C,L,Board,TmpCount),
     Next_Count is Count + TmpCount,
-   % write('Next_Count: '),write(Next_Count),nl,
     (C =:= 9 -> 
         Next_C is 0,Next_L is L+1;
         Next_C is C+1,Next_L is L),
