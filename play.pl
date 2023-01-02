@@ -72,13 +72,12 @@ game_over([Board,PlayerTurn],Result) :-
     count_pieces_in_goal(Board,Result).
 
 
-result(0,'none').
-result(2,'Player').
-result(-2,'Player').
 result(3,'Player').
 result(4,'Player').
-result(-3,'Player').
-result(-4,'Player').
+result(8,'Player').
+result(15,'Player').
+result(16,'Player').
+result(20,'Player').
 result(_,'none').
 
 % count_pieces(+Board,+Count,-Result)
@@ -86,9 +85,9 @@ result(_,'none').
 % if the number of pieces is >=3, or <=-3 then the game is over
 count_pieces_in_goal(Board,Result) :-
     check_line(0,0,Board,0,Count),
-  %  write('Count: '),write(Count),nl,
+    write('Count: '),write(Count),nl,
     result(Count,Result),
-   % write('Result: '),write(Result),nl.
+    write('Result: '),write(Result),nl.
 
 
 
@@ -96,7 +95,6 @@ check_line(_,10,_,Count,Count).
 check_line(C,L,Board,Count,FinalCount):-
     L=<9,
     check_column(C,L,Board,TmpCount),
-    
     Next_Count is Count + TmpCount,
    % write('Next_Count: '),write(Next_Count),nl,
     (C =:= 9 -> 
@@ -105,12 +103,12 @@ check_line(C,L,Board,Count,FinalCount):-
     check_line(Next_C,Next_L,Board,Next_Count,FinalCount).
 
 
-return_count(6,-1).
-return_count(7,-1).
-return_count(8,-1).
-return_count(10,1).
-return_count(11,1).
-return_count(12,1).
+return_count(6,1).
+return_count(7,1).
+return_count(8,1).
+return_count(10,5).
+return_count(11,5).
+return_count(12,5).
 return_count(_,0).
 check_column(C,L,Board,TmpCount):-
     nth0(L,Board,Line),
