@@ -117,21 +117,24 @@ move([Board,PlayerTurn],SR-SC-ER-EC,[NewBoard,NewPlayerTurn]):-
         replace_m_n(TempBoard,ER,EC,NewEndElem,NewBoard), 
         change_turn(PlayerTurn,NewPlayerTurn).
 
-% can_move(+GameState,?Move)
-%
-% Checks if a move is valid in the current game state.
 
+/*
 can_move(GameState,SR-SC-ER-EC,ScaredPiece):-
         check_scared_board(GameState,ScaredPiece),
        % write('Scared Piece: '),
       %  write_scared_piece(ScaredPiece),nl,
-        nonvar(ScaredPiece),
-        \+compare_scare_piece(ScaredPiece,SR,SC), 
+        nonvar(ScaredPiece), 
         !,
+        \+compare_scare_piece(ScaredPiece,SR,SC), 
+       
         write('Need to move Piece in: '),
         write_scared_piece(ScaredPiece),nl,
         fail.
-
+*/
+% can_move(+GameState,?Move,?ScaredPiece)
+% 
+%
+% Checks if a move is valid in the current game state.
 can_move([Board,PlayerTurn],SR-SC-ER-EC,ScaredPiece):-
         check_scared_board([Board,PlayerTurn],ScaredPiece),
         (nonvar(ScaredPiece)->compare_scare_piece(ScaredPiece,SR,SC);var(ScaredPiece)),
@@ -754,7 +757,10 @@ check_not_scared_elem(ColumnNumber,LineNumber,Board,PlayerTurn):-
         LineaboveNumber is LineNumber-1,
         LinebellowNumber is LineNumber+1,
         nth0(ElemRightNumber,Line,Elemright),
-
+        write('Elemright: '),
+        write(Elemright),
+        write('Scared: '),
+        write(Scared),
         Elemright\=Scared,
         Elemright\=9+Scared,
         nth0(ElemLeftNumber,Line,Elemleft),

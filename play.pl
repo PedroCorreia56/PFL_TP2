@@ -1,3 +1,11 @@
+:- consult('display.pl').
+:- consult('inputs.pl').
+:- consult('menu.pl').
+:- consult('logic.pl').
+:-use_module(library(lists)).
+:-use_module(library(system)).
+:-use_module(library(random)).
+
 %play/0
 %main predicate for game start, presents the main menu
 play :-
@@ -30,12 +38,14 @@ game_loop(GameState):-
 process_result([NewBoard,NewPlayerTurn],'Player'):-
     clear,
     display_game([NewBoard,NewPlayerTurn]),
+    
     winner(NewPlayerTurn,Winner),
     format('~n~`*t Winner - Player ~d ~`*t~48|~n', [Winner]),
+    write([NewBoard,NewPlayerTurn]),
     sleep(5),clear.
 % Case if the game is not over
 process_result(NewGameState,'none'):-
-    %clear, 
+    clear,
     display_game(NewGameState),
     game_loop(NewGameState).
 
